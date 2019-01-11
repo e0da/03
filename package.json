@@ -1,0 +1,9 @@
+{
+  "name": "03",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/justinforce/03",
+  "author": "Justin Force <justin.force@gmail.com>",
+  "license": "ISC",
+  "private": true
+}

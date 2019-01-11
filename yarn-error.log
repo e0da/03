@@ -1,0 +1,36 @@
+Arguments: 
+  /home/force/.nvm/versions/node/v10.12.0/bin/node /home/force/.yarn/bin/yarn.js init
+
+PATH: 
+  /home/force/.yarn/bin:/home/force/.config/yarn/global/node_modules/.bin:/home/force/.nvm/versions/node/v10.12.0/bin:/home/force/.rbenv/shims:/home/force/.rbenv/bin:/home/force/.pyenv/plugins/pyenv-virtualenv/shims:/home/force/.pyenv/shims:/home/force/.pyenv/bin:/home/force/go/bin:./node_modules/.bin:/home/force/.yarn/bin:/home/force/bin:/home/force/.local/bin:/home/force/.local/opt/bin:/usr/local/sbin:/usr/local/bin:/home/force/.local/bin:/home/force/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/Applications/Postgres.app/Contents/Versions/9.5/bin:/home/force/.fzf/bin
+
+Yarn version: 
+  1.12.3
+
+Node version: 
+  10.12.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/home/force/.yarn/lib/cli.js:125278:13)
+      at Interface.emit (events.js:182:13)
+      at Interface._ttyWrite (readline.js:783:16)
+      at ReadStream.onkeypress (readline.js:168:10)
+      at ReadStream.emit (events.js:182:13)
+      at emitKeys (internal/readline.js:424:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1022:36)
+      at ReadStream.emit (events.js:182:13)
+      at addChunk (_stream_readable.js:283:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
