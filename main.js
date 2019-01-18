@@ -1,6 +1,13 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
+// SNES-ish resolution
+const width = 512;
+const height = 384;
+
+canvas.width = width;
+canvas.height = height;
+
 // Draw a bordered rectangle with a greeting
 const borderWidth = 10;
 ctx.fillStyle = "#222";
