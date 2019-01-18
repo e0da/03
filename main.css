@@ -2,4 +2,14 @@ html,
 body {
   background: #333;
   color: #efefef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+canvas {
+  width: 4000px;
+  max-width: 63%;
+  image-rendering: pixelated;
 }
