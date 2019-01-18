@@ -2,38 +2,67 @@ const gilesSrc = require("./giles.png");
 
 let state;
 
-// SNES-ish resolution
-const width = 512 / 4;
-const height = 384 / 4;
+// I picked this value because it's half of 400x300, and it gives nice chunky pixels
+const width = 200;
+const height = 150;
 
-const draw = () => {
+const drawBackground = () => {
   const { canvas, ctx, giles } = state;
-  // Draw a bordered rectangle with a greeting
   ctx.fillStyle = "#334";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+};
 
-  // Draw Giles
+const drawGiles = () => {
+  const { ctx, giles } = state;
   const scale = 1;
-  const w = giles.width * scale;
-  const h = giles.height * scale;
+  const w = giles.img.width * scale;
+  const h = giles.img.height * scale;
   const x = width / 2 - w / 2;
   const y = height / 2 - h / 2;
   const originalSmoothing = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(giles, x, y, w, h);
+  ctx.drawImage(giles.img, x, y, w, h);
   ctx.imageSmoothingEnabled = originalSmoothing;
 };
 
+const drawBall = () => {
+  const { ctx, ball } = state;
+  ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+};
+
+const draw = () => {
+  drawBackground();
+  drawBall();
+  drawGiles();
+};
+
+const updateGiles = () => {
+  const { giles } = state;
+  const { img, xInhale, yInhale, speed } = giles;
+  if (img.width < 10) state.giles.xInhale = true;
+  if (img.width > width) state.giles.xInhale = false;
+  if (img.height < 10) state.giles.yInhale = true;
+  if (img.height > height) state.giles.yInhale = false;
+  if (xInhale) state.giles.img.width += speed;
+  else state.giles.img.width -= speed;
+  if (yInhale) state.giles.img.height += speed;
+  else state.giles.img.height -= speed;
+};
+
+const updateBall = () => {
+  const { ball } = state;
+  if (ball.x > width || ball.x < 0) state.ball.vx *= -1;
+  if (ball.y > height || ball.y < 0) state.ball.vy *= -1;
+  state.ball.x += ball.vx;
+  state.ball.y += ball.vy;
+};
+
 const update = () => {
-  const { giles, gilesSpeed, xInhale, yInhale } = state;
-  if (giles.width < 10) state.xInhale = true;
-  if (giles.width > width) state.xInhale = false;
-  if (giles.height < 10) state.yInhale = true;
-  if (giles.height > height) state.yInhale = false;
-  if (xInhale) state.giles.width += gilesSpeed;
-  else state.giles.width -= gilesSpeed;
-  if (yInhale) state.giles.height += gilesSpeed;
-  else state.giles.height -= gilesSpeed;
+  updateGiles();
+  updateBall();
 };
 
 const step = () => {
@@ -42,21 +71,42 @@ const step = () => {
   window.requestAnimationFrame(step);
 };
 
+const setupGiles = () => {
+  const img = new Image();
+  img.src = gilesSrc;
+  return {
+    img,
+    xInhale: true,
+    yInhale: true,
+    speed: 1
+  };
+};
+
+const setupBall = () => {
+  const ballRadius = 3;
+  return {
+    x: width / 2 - ballRadius / 2,
+    y: height / 2 - ballRadius / 2,
+    r: ballRadius,
+    vx: 2,
+    vy: 1
+  };
+};
+
 const setup = () => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
-  const giles = new Image();
-  giles.src = gilesSrc;
+  const giles = setupGiles();
+  const ball = setupBall();
+
   canvas.width = width;
   canvas.height = height;
 
   state = {
     canvas,
     ctx,
-    giles,
-    xInhale: true,
-    yInhale: true,
-    gilesSpeed: 1
+    ball,
+    giles
   };
 };
 
