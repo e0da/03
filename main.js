@@ -4,8 +4,8 @@ const beachSrc = require("./beach.jpg");
 let state;
 
 // I picked this value because it's half of 400x300, and it gives nice chunky pixels
-const width = 200;
-const height = 150;
+const width = 192;
+const height = 108;
 
 const drawBackground = () => {
   const { canvas, ctx } = state;
@@ -28,7 +28,9 @@ const drawTexture = () => {
 
 const drawBall = () => {
   const { ctx, ball } = state;
-  ctx.fillStyle = "yellow";
+  const colors = ["white", "cyan", "magenta", "yellow"];
+  const color = colors[Math.ceil(Math.random() * colors.length)];
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
   ctx.fill();
