@@ -1,22 +1,18 @@
 const gilesSrc = require("./giles.png");
 const beachSrc = require("./beach.jpg");
 
-let state;
-
 // I picked this value because it's half of 400x300, and it gives nice chunky pixels
 const width = 192;
 const height = 108;
 const maxBalls = 100;
 const colors = ["white", "cyan", "magenta", "yellow"];
 
-const drawBackground = () => {
-  const { canvas, ctx } = state;
-  ctx.fillStyle = "#334";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+const drawBackground = (ctx, background) => {
+  ctx.fillStyle = background.color;
+  ctx.fillRect(0, 0, background.w, background.h);
 };
 
-const drawTexture = () => {
-  const { ctx, texture } = state;
+const drawTexture = (ctx, texture) => {
   if (!texture.enabled) return;
   const scale = 1;
   const w = texture.img.width * scale;
@@ -29,24 +25,27 @@ const drawTexture = () => {
   ctx.imageSmoothingEnabled = originalSmoothing;
 };
 
-const drawBalls = () => {
-  const { ctx, balls } = state;
+const drawBall = (ctx, ball) => {
+  ctx.fillStyle = ball.color;
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+};
+
+const drawBalls = (ctx, balls) => {
   for (let i = 0; i < balls.length; i++) {
-    const ball = balls[i];
-    ctx.fillStyle = ball.color;
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.fill();
+    drawBall(ctx, balls[i]);
   }
 };
 
-const draw = () => {
-  drawBackground();
-  drawBalls();
-  drawTexture();
+const draw = state => {
+  const { ctx, background, balls, texture } = state;
+  drawBackground(ctx, background);
+  drawBalls(ctx, balls);
+  drawTexture(ctx, texture);
 };
 
-const updateTexture = () => {
+const updateTexture = state => {
   const { texture } = state;
   const { img, xInhale, yInhale, speed } = texture;
 
@@ -72,20 +71,24 @@ const updateBalls = () => {
   }
 };
 
-const update = () => {
-  updateTexture();
-  updateBalls();
+const update = state => {
+  updateTexture(state);
+  updateBalls(state);
 };
 
-const step = () => {
-  update();
-  draw();
-  window.requestAnimationFrame(step);
+const step = state => timestamp => {
+  update(state);
+  draw(state);
+  window.requestAnimationFrame(step(state));
 };
 
-const setupTexture = () => {
+const setupBackground = (color = "white", w = 160, h = 90) => {
+  return { color, w, h };
+};
+
+const setupTexture = src => {
   const img = new Image();
-  img.src = beachSrc;
+  img.src = src;
   return {
     img,
     xInhale: true,
@@ -95,7 +98,7 @@ const setupTexture = () => {
   };
 };
 
-const setupBalls = () => {
+const setupBalls = (maxBalls = 5) => {
   let balls = [];
   for (let i = 0; i < maxBalls; i++) {
     const x = Math.floor(Math.random() * width);
@@ -110,22 +113,23 @@ const setupBalls = () => {
   return balls;
 };
 
-const setup = () => {
+const setup = state => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
-  const texture = setupTexture();
-  const balls = setupBalls();
+  const background = setupBackground("#334", canvas.width, canvas.height);
+  const texture = setupTexture(beachSrc);
+  const balls = setupBalls(maxBalls);
 
   canvas.width = width;
   canvas.height = height;
 
-  state = {
-    canvas,
-    ctx,
-    balls,
-    texture
-  };
+  state.canvas = canvas;
+  state.ctx = ctx;
+  state.background = background;
+  state.balls = balls;
+  state.texture = texture;
 };
 
-setup();
-window.requestAnimationFrame(step);
+let state = {};
+setup(state);
+window.requestAnimationFrame(step(state));
