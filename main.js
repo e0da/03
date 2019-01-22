@@ -1,17 +1,16 @@
-const gilesSrc = require("./giles.png");
-const beachSrc = require("./beach.jpg");
+// const gilesSrc = require("./giles.png");
+const BEACH_SRC = require("./beach.jpg");
 
-const textureSrc = beachSrc;
+const TEXTURE_SRC = BEACH_SRC;
 
-const { log, warn, error } = console;
+// const { log, warn, error } = console;
 
-// I picked this value because it's half of 400x300, and it gives nice chunky pixels
-const frameRate = 60;
-const frameSteps = frameRate / 1000;
-const width = 192;
-const height = 108;
-const maxBalls = 100;
-const colors = ["white", "cyan", "magenta", "yellow"];
+const FRAME_RATE = 60;
+const FRAME_STEPS = FRAME_RATE / 1000;
+const WIDTH = 192;
+const HEIGHT = 108;
+const MAX_BALLS = 100;
+const BALL_COLORS = ["white", "cyan", "magenta", "yellow"];
 
 const drawBackground = (ctx, background) => {
   ctx.fillStyle = background.color;
@@ -23,8 +22,8 @@ const drawTexture = (ctx, texture) => {
   const scale = 1;
   const w = texture.img.width * scale;
   const h = texture.img.height * scale;
-  const x = width / 2 - w / 2;
-  const y = height / 2 - h / 2;
+  const x = WIDTH / 2 - w / 2;
+  const y = HEIGHT / 2 - h / 2;
   const originalSmoothing = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(texture.img, x, y, w, h);
@@ -39,9 +38,7 @@ const drawBall = (ctx, ball) => {
 };
 
 const drawBalls = (ctx, balls) => {
-  for (let i = 0; i < balls.length; i++) {
-    drawBall(ctx, balls[i]);
-  }
+  for (let i = 0; i < balls.length; i += 1) drawBall(ctx, balls[i]);
 };
 
 const draw = state => {
@@ -55,9 +52,9 @@ const updateTexture = texture => {
   const { img, xInhale, yInhale, speed } = texture;
 
   if (img.width < 10) texture.xInhale = true;
-  if (img.width > width) texture.xInhale = false;
+  if (img.width > WIDTH) texture.xInhale = false;
   if (img.height < 10) texture.yInhale = true;
-  if (img.height > height) texture.yInhale = false;
+  if (img.height > HEIGHT) texture.yInhale = false;
 
   if (xInhale) texture.img.width += speed;
   else texture.img.width -= speed;
@@ -65,19 +62,20 @@ const updateTexture = texture => {
   else texture.img.height -= speed;
 };
 
+const updateBall = ball => {
+  if (ball.x > WIDTH || ball.x < 0) ball.vx *= -1;
+  if (ball.y > HEIGHT || ball.y < 0) ball.vy *= -1;
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+};
+
 const updateBalls = balls => {
-  for (let i = 0; i < balls.length; i++) {
-    const ball = balls[i];
-    if (ball.x > width || ball.x < 0) ball.vx *= -1;
-    if (ball.y > height || ball.y < 0) ball.vy *= -1;
-    ball.x += ball.vx;
-    ball.y += ball.vy;
-  }
+  for (let i = 0; i < balls.length; i += 1) updateBall(balls[i]);
 };
 
 const updateTiming = (timing, timestamp) => {
   const last = timing.now;
-  const now = performance.now();
+  const now = timestamp;
   const dt = now - last;
 
   timing.last = last;
@@ -97,9 +95,7 @@ const step = state => timestamp => {
   window.requestAnimationFrame(step(state));
 };
 
-const setupBackground = (color = "white", w = 160, h = 90) => {
-  return { color, w, h };
-};
+const setupBackground = (color = "white", w = 160, h = 90) => ({ color, w, h });
 
 const setupTexture = src => {
   const img = new Image();
@@ -114,14 +110,14 @@ const setupTexture = src => {
 };
 
 const setupBalls = (maxBalls = 5) => {
-  let balls = [];
-  for (let i = 0; i < maxBalls; i++) {
-    const x = Math.floor(Math.random() * width);
-    const y = Math.floor(Math.random() * height);
+  const balls = [];
+  for (let i = 0; i < maxBalls; i += 1) {
+    const x = Math.floor(Math.random() * WIDTH);
+    const y = Math.floor(Math.random() * HEIGHT);
     const r = Math.random() * 3;
     const vx = Math.random() * 3;
     const vy = Math.random() * 3;
-    const color = colors[Math.floor(Math.random() * colors.length)];
+    const color = BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)];
     const ball = { x, y, r, vx, vy, color };
     balls.push(ball);
   }
@@ -139,13 +135,13 @@ const setup = state => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   const now = performance.now();
-  const timing = setupTiming(frameSteps, frameRate, now);
-  const background = setupBackground("#334", width, height);
-  const texture = setupTexture(textureSrc);
-  const balls = setupBalls(maxBalls);
+  const timing = setupTiming(FRAME_STEPS, FRAME_RATE, now);
+  const background = setupBackground("#334", WIDTH, HEIGHT);
+  const texture = setupTexture(TEXTURE_SRC);
+  const balls = setupBalls(MAX_BALLS);
 
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
 
   state.timing = timing;
   state.canvas = canvas;
@@ -155,6 +151,6 @@ const setup = state => {
   state.texture = texture;
 };
 
-let state = {};
+const state = {};
 setup(state);
 window.requestAnimationFrame(step(state));

@@ -16,6 +16,6 @@
   },
   "scripts": {
     "start": "parcel index.html",
-    "lint": "eslint ."
+    "lint": "eslint main.js"
   }
 }
