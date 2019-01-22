@@ -5,3 +5,4 @@ yarn-error.log
 # Parcel
 .cache
 dist
+yarn-error.log
