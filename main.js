@@ -3,7 +3,7 @@ import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
 
-// const { log, warn, error } = console;
+const { /* debug, log, warn, */ error } = console;
 
 const FRAME_RATE = 60;
 const FRAME_STEPS = FRAME_RATE / 1000;
@@ -48,18 +48,25 @@ const draw = state => {
   drawTexture(ctx, texture);
 };
 
-const updateTexture = texture => {
-  const { img, xInhale, yInhale, speed } = texture;
+const toggle = (activate, deactivate, current) => {
+  if (activate) return true;
+  if (deactivate) return false;
+  return current;
+};
 
-  if (img.width < 10) texture.xInhale = true;
-  if (img.width > WIDTH) texture.xInhale = false;
-  if (img.height < 10) texture.yInhale = true;
-  if (img.height > HEIGHT) texture.yInhale = false;
+const updateTexture = ({ get, set }) => {
+  const { img, xInhale, yInhale, speed } = get();
+  const { width, height } = img;
 
-  if (xInhale) texture.img.width += speed;
-  else texture.img.width -= speed;
-  if (yInhale) texture.img.height += speed;
-  else texture.img.height -= speed;
+  const newXInhale = toggle(width < 10, width > WIDTH, xInhale);
+  const newYInhale = toggle(height < 10, height > HEIGHT, yInhale);
+  set("xInhale", newXInhale);
+  set("yInhale", newYInhale);
+
+  const newWidth = xInhale ? width + speed : width - speed;
+  const newHeight = yInhale ? height + speed : height - speed;
+  set("img.width", newWidth);
+  set("img.height", newHeight);
 };
 
 const updateBall = ball => {
@@ -83,9 +90,53 @@ const updateTiming = (timing, timestamp) => {
   timing.dt = dt;
 };
 
+const key = path => path.split(".").pop();
+
+const parent = state => path => {
+  let node;
+  let next = state;
+  const fragments = path.split(".");
+  fragments.forEach(fragment => {
+    node = next;
+    next = next[fragment];
+    if (next === undefined) {
+      const msg = `The path could not be found in the state`;
+      error({ msg, path, state });
+      throw new Error(msg);
+    }
+  });
+  return node;
+};
+
+/**
+ * Returns a getter for reading values from state. Returns the root state object if no path is provided.
+ *
+ * @example
+ * const state = {pets: { cats: 2, dogs: 0}}
+ * const get = getter(pets)
+ * get() == { cats: 2, dogs: 0 }
+ * get('cats') == 2
+ *
+ * @param {Object} state The state object to be queried
+ * @param {String} path A dot-separated path to the desired value, e.g. texture.img
+ */
+const getter = state => path => {
+  if (!path) return state;
+  return parent(state)(path)[key(path)];
+};
+
+const setter = state => (path, value) => {
+  parent(state)(path)[key(path)] = value;
+};
+
+const accessors = (gettable, settable) => ({
+  get: getter(gettable),
+  set: setter(settable)
+});
+
 const update = (state, timestamp) => {
   updateTiming(state.timing, timestamp);
-  updateTexture(state.texture);
+  updateTexture(accessors(state.texture, state.texture));
   updateBalls(state.balls);
 };
 
