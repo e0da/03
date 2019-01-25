@@ -30,7 +30,7 @@ const drawTexture = (ctx, texture) => {
   ctx.imageSmoothingEnabled = originalSmoothing;
 };
 
-const drawBall = (ctx, ball) => {
+const drawBall = ctx => ball => {
   ctx.fillStyle = ball.color;
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
@@ -38,7 +38,7 @@ const drawBall = (ctx, ball) => {
 };
 
 const drawBalls = (ctx, balls) => {
-  for (let i = 0; i < balls.length; i += 1) drawBall(ctx, balls[i]);
+  balls.forEach(drawBall(ctx));
 };
 
 const draw = state => {
@@ -70,7 +70,7 @@ const updateBall = ball => {
 };
 
 const updateBalls = balls => {
-  for (let i = 0; i < balls.length; i += 1) updateBall(balls[i]);
+  balls.forEach(updateBall);
 };
 
 const updateTiming = (timing, timestamp) => {
