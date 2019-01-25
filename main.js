@@ -1,5 +1,5 @@
-// const gilesSrc = require("./giles.png");
-const BEACH_SRC = require("./beach.jpg");
+// import GILES_SRC from "./giles.png";
+import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
 

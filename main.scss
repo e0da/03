@@ -1,0 +1,39 @@
+$background: #333;
+
+.fill-container-and-maintain-aspect-ratio {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.allow-max-height-children {
+  width: 100%;
+  height: 100%;
+}
+
+.center-children {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html,
+body {
+  @extend .allow-max-height-children;
+  @extend .center-children;
+
+  background: $background;
+}
+
+body {
+  /* html, body {height: 100%} adds scroll bars in Chrome */
+  overflow-y: hidden;
+}
+
+canvas {
+  @extend .fill-container-and-maintain-aspect-ratio;
+
+  /* Make it pretty! */
+  image-rendering: pixelated;
+}
