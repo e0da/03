@@ -35,10 +35,11 @@ const key = path => path.split(".").pop();
  * if no path is provided.
  *
  * @example
- * const state = {pets: { cats: 2, dogs: 0}}
- * const get = getter(pets)
- * get() == { cats: 2, dogs: 0 }
- * get('cats') == 2
+ * const state = { pets: { cats: { black: 1, orange: 0.5 }, dogs: {} } }
+ * const get = getter(state.pets)
+ * get() == { cats: { black: 1, orange: 0.5 }, dogs: {} }
+ * get('cats') == { black: 1, orange: 0.5 }
+ * get('cats.black') == 1
  *
  * @param {Object} node The object to be queried
  * @param {String} path A dot-separated path to the desired value, e.g. texture.img
