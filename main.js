@@ -12,6 +12,51 @@ const HEIGHT = 108;
 const MAX_BALLS = 100;
 const BALL_COLORS = ["white", "cyan", "magenta", "yellow"];
 
+const parent = state => path => {
+  let node;
+  let next = state;
+  const fragments = path.split(".");
+  fragments.forEach(fragment => {
+    node = next;
+    if (next === undefined) {
+      const msg = `The path could not be found in the state`;
+      error({ msg, path, state });
+      throw new Error(msg);
+    }
+    next = next[fragment];
+  });
+  return node;
+};
+
+const key = path => path.split(".").pop();
+
+/**
+ * Returns a getter for reading values from an object. Returns the root object
+ * if no path is provided.
+ *
+ * @example
+ * const state = {pets: { cats: 2, dogs: 0}}
+ * const get = getter(pets)
+ * get() == { cats: 2, dogs: 0 }
+ * get('cats') == 2
+ *
+ * @param {Object} node The object to be queried
+ * @param {String} path A dot-separated path to the desired value, e.g. texture.img
+ */
+const getter = node => path => {
+  if (!path) return node;
+  return parent(node)(path)[key(path)];
+};
+
+const setter = node => (path, value) => {
+  parent(node)(path)[key(path)] = value;
+};
+
+const accessors = node => ({
+  get: getter(node),
+  set: setter(node)
+});
+
 const drawBackground = (ctx, background) => {
   ctx.fillStyle = background.color;
   ctx.fillRect(0, 0, background.w, background.h);
@@ -41,8 +86,8 @@ const drawBalls = (ctx, balls) => {
   balls.forEach(drawBall(ctx));
 };
 
-const draw = state => {
-  const { ctx, background, balls, texture } = state;
+const draw = ({ get }) => {
+  const { ctx, background, balls, texture } = get();
   drawBackground(ctx, background);
   drawBalls(ctx, balls);
   drawTexture(ctx, texture);
@@ -69,81 +114,45 @@ const updateTexture = ({ get, set }) => {
   set("img.height", newHeight);
 };
 
-const updateBall = ball => {
-  if (ball.x > WIDTH || ball.x < 0) ball.vx *= -1;
-  if (ball.y > HEIGHT || ball.y < 0) ball.vy *= -1;
-  ball.x += ball.vx;
-  ball.y += ball.vy;
+const updateBall = ({ get, set }) => {
+  const { x, y, vx, vy } = get();
+  const reverseX = x > WIDTH || x < 0 ? -1 : 1;
+  const reverseY = y > HEIGHT || y < 0 ? -1 : 1;
+  const newVX = vx * reverseX;
+  const newVY = vy * reverseY;
+  const newX = x + newVX;
+  const newY = y + newVY;
+  set("vx", newVX);
+  set("vy", newVY);
+  set("x", newX);
+  set("y", newY);
 };
 
-const updateBalls = balls => {
-  balls.forEach(updateBall);
+const updateBalls = ({ get }) => {
+  const balls = get();
+  balls.forEach(ball => updateBall(accessors(ball)));
 };
 
-const updateTiming = (timing, timestamp) => {
-  const last = timing.now;
+const updateTiming = ({ get, set }, timestamp) => {
+  const last = get("now");
   const now = timestamp;
   const dt = now - last;
-
-  timing.last = last;
-  timing.now = now;
-  timing.dt = dt;
+  set("last", last);
+  set("now", now);
+  set("dt", dt);
 };
 
-const key = path => path.split(".").pop();
-
-const parent = state => path => {
-  let node;
-  let next = state;
-  const fragments = path.split(".");
-  fragments.forEach(fragment => {
-    node = next;
-    next = next[fragment];
-    if (next === undefined) {
-      const msg = `The path could not be found in the state`;
-      error({ msg, path, state });
-      throw new Error(msg);
-    }
-  });
-  return node;
+const update = ({ get }, timestamp) => {
+  const { timing, texture, balls } = get();
+  updateTiming(accessors(timing), timestamp);
+  updateTexture(accessors(texture));
+  updateBalls(accessors(balls));
 };
 
-/**
- * Returns a getter for reading values from state. Returns the root state object if no path is provided.
- *
- * @example
- * const state = {pets: { cats: 2, dogs: 0}}
- * const get = getter(pets)
- * get() == { cats: 2, dogs: 0 }
- * get('cats') == 2
- *
- * @param {Object} state The state object to be queried
- * @param {String} path A dot-separated path to the desired value, e.g. texture.img
- */
-const getter = state => path => {
-  if (!path) return state;
-  return parent(state)(path)[key(path)];
-};
-
-const setter = state => (path, value) => {
-  parent(state)(path)[key(path)] = value;
-};
-
-const accessors = (gettable, settable) => ({
-  get: getter(gettable),
-  set: setter(settable)
-});
-
-const update = (state, timestamp) => {
-  updateTiming(state.timing, timestamp);
-  updateTexture(accessors(state.texture, state.texture));
-  updateBalls(state.balls);
-};
-
-const step = state => timestamp => {
-  update(state, timestamp);
-  draw(state);
-  window.requestAnimationFrame(step(state));
+const step = ({ get, set }) => timestamp => {
+  update({ get, set }, timestamp);
+  draw({ get });
+  window.requestAnimationFrame(step({ get, set }));
 };
 
 const setupBackground = (color = "white", w = 160, h = 90) => ({ color, w, h });
@@ -151,6 +160,8 @@ const setupBackground = (color = "white", w = 160, h = 90) => ({ color, w, h });
 const setupTexture = src => {
   const img = new Image();
   img.src = src;
+  img.width = WIDTH;
+  img.height = HEIGHT;
   return {
     img,
     xInhale: true,
@@ -182,7 +193,7 @@ const setupTiming = (frameSteps, frameRate, now) => {
   return { last, now, dt };
 };
 
-const setup = state => {
+const setup = ({ set }) => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   const now = performance.now();
@@ -194,14 +205,14 @@ const setup = state => {
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  state.timing = timing;
-  state.canvas = canvas;
-  state.ctx = ctx;
-  state.background = background;
-  state.balls = balls;
-  state.texture = texture;
+  set("timing", timing);
+  set("canvas", canvas);
+  set("ctx", ctx);
+  set("background", background);
+  set("balls", balls);
+  set("texture", texture);
 };
 
 const state = {};
-setup(state);
-window.requestAnimationFrame(step(state));
+setup(accessors(state));
+window.requestAnimationFrame(step(accessors(state)));
