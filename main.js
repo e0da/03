@@ -1,16 +1,17 @@
-// import GILES_SRC from "./giles.png";
 import { setter } from "./state";
+import { times } from "./utility";
+import * as Background from "./Background";
 import * as Balls from "./Balls";
 import * as Texture from "./Texture";
 import * as Timing from "./Timing";
-import * as Background from "./Background";
-import BEACH_SRC from "./beach.jpg";
 import draw from "./drawing";
+
+import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
 
 const FRAME_RATE = 60;
-const FRAME_STEPS = FRAME_RATE / 1000;
+const FRAME_STEPS = Math.floor(1000 / FRAME_RATE);
 const WIDTH = 192;
 const HEIGHT = 108;
 const MAX_BALLS = 100;
@@ -18,8 +19,11 @@ const BALL_COLORS = ["white", "cyan", "magenta", "yellow"];
 
 const update = (state, timestamp) => {
   const { width, height, timing, texture, balls } = state;
+  const { dt, steps } = timing;
   Timing.update({ timing, timestamp, set: setter(timing) });
-  Texture.update({ texture, width, height, set: setter(texture) });
+  times(steps, () => {
+    Texture.update({ texture, width, height, dt, set: setter(texture) });
+  });
   Balls.update({ balls, width, height, set: setter(balls) });
 };
 
@@ -29,7 +33,8 @@ const step = state => timestamp => {
   window.requestAnimationFrame(step(state));
 };
 
-const setup = ({ set }) => {
+const initialState = () => {
+  const [width, height] = [WIDTH, HEIGHT];
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   const now = performance.now();
@@ -41,16 +46,17 @@ const setup = ({ set }) => {
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 
-  set("timing", timing);
-  set("canvas", canvas);
-  set("width", WIDTH);
-  set("height", HEIGHT);
-  set("ctx", ctx);
-  set("background", background);
-  set("balls", balls);
-  set("texture", texture);
+  return {
+    background,
+    balls,
+    canvas,
+    ctx,
+    height,
+    texture,
+    timing,
+    width
+  };
 };
 
-const state = {};
-setup({ set: setter(state) });
+const state = initialState();
 window.requestAnimationFrame(step(state));

@@ -1,3 +1,7 @@
 const { debug, log, warn, error } = console;
 
-export { debug, log, warn, error };
+const times = (n, cb) => {
+  for (let i = 0; i < n; i += 1) cb();
+};
+
+export { debug, log, warn, error, times };

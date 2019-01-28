@@ -6,8 +6,8 @@ const drawBackground = (ctx, background) => {
 const drawTexture = (ctx, width, height, texture) => {
   if (!texture.enabled) return;
   const scale = 1;
-  const w = texture.img.width * scale;
-  const h = texture.img.height * scale;
+  const w = texture.width * scale;
+  const h = texture.height * scale;
   const x = width / 2 - w / 2;
   const y = height / 2 - h / 2;
   const originalSmoothing = ctx.imageSmoothingEnabled;
