@@ -1,5 +1,7 @@
 import BLANK_SRC from "./blank.png";
 
+const SPEED_SCALE = 0.005;
+
 const toggle = (activate, deactivate, current) => {
   if (activate) return true;
   if (deactivate) return false;

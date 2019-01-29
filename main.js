@@ -23,8 +23,8 @@ const update = (state, timestamp) => {
   Timing.update({ timing, timestamp, set: setter(timing) });
   times(steps, () => {
     Texture.update({ texture, width, height, dt, set: setter(texture) });
+    Balls.update({ balls, width, height, dt, set: setter(balls) });
   });
-  Balls.update({ balls, width, height, set: setter(balls) });
 };
 
 const step = state => timestamp => {
