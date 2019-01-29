@@ -27,11 +27,13 @@ const drawBalls = (ctx, balls) => {
   balls.forEach(drawBall(ctx));
 };
 
+// TODO Use alpha to interpolate animation
 const draw = state => {
-  const { ctx, width, height, background, balls, texture } = state;
+  const { ctx, width, height, background, balls, texture, timing } = state;
+  const { alpha } = timing;
   drawBackground(ctx, background);
   drawBalls(ctx, balls);
-  drawTexture(ctx, width, height, texture);
+  drawTexture(ctx, width, height, texture, alpha);
 };
 
 export default draw;
