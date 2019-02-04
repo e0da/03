@@ -1,7 +1,8 @@
 import { setter } from "./state";
+import { peek } from "./utility";
 
-const SPEED_SCALE = 0.001;
-const MAX_SPEED = 10;
+const SPEED_SCALE = 1;
+const MAX_SPEED = 3;
 
 const initialState = (
   maxBalls = 10,
@@ -24,14 +25,16 @@ const initialState = (
   return balls;
 };
 
-const updateBall = ({ ball, dt, width, height, set }) => {
+const updateBall = ({ ball, timing, width, height, set }) => {
   const { x, y, vx, vy } = ball;
+  const { increment } = timing;
   const reverseX = x > width || x < 0 ? -1 : 1;
   const reverseY = y > height || y < 0 ? -1 : 1;
   const newVX = vx * reverseX;
   const newVY = vy * reverseY;
-  const xOffset = newVX * dt * SPEED_SCALE;
-  const yOffset = newVY * dt * SPEED_SCALE;
+  peek("incremnet", increment);
+  const xOffset = newVX * increment * SPEED_SCALE;
+  const yOffset = newVY * increment * SPEED_SCALE;
   const newX = x + xOffset;
   const newY = y + yOffset;
   set("prev.vx", vx);
@@ -44,9 +47,9 @@ const updateBall = ({ ball, dt, width, height, set }) => {
   set("y", newY);
 };
 
-const update = ({ balls, dt, width, height }) => {
+const update = ({ balls, timing, width, height }) => {
   balls.forEach(ball =>
-    updateBall({ ball, dt, width, height, set: setter(ball) })
+    updateBall({ ball, timing, width, height, set: setter(ball) })
   );
 };
 

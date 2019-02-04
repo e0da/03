@@ -10,8 +10,8 @@ import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
 
-const FRAME_RATE = 60;
-const FRAME_STEPS = Math.floor(1000 / FRAME_RATE);
+const IDEAL_FRAME_RATE = 60 / 1000;
+const IDEAL_STEP_RATE = 60 / 1000;
 const WIDTH = 192;
 const HEIGHT = 108;
 const MAX_BALLS = 100;
@@ -19,11 +19,14 @@ const BALL_COLORS = ["white", "cyan", "magenta", "yellow"];
 
 const update = (state, timestamp) => {
   const { width, height, timing, texture, balls } = state;
-  const { dt, steps } = timing;
-  Timing.update({ timing, timestamp, set: setter(timing) });
-  times(steps, () => {
-    Texture.update({ texture, width, height, dt, set: setter(texture) });
-    Balls.update({ balls, width, height, dt, set: setter(balls) });
+  Timing.update({
+    timing,
+    timestamp,
+    set: setter(timing)
+  });
+  times(timing.steps, () => {
+    Texture.update({ texture, width, height, timing, set: setter(texture) });
+    Balls.update({ balls, width, height, timing, set: setter(balls) });
   });
 };
 
@@ -38,7 +41,7 @@ const initialState = () => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   const now = performance.now();
-  const timing = Timing.initialState(FRAME_STEPS, FRAME_RATE, now);
+  const timing = Timing.initialState(IDEAL_FRAME_RATE, IDEAL_STEP_RATE, now);
   const background = Background.initialState("#334", WIDTH, HEIGHT);
   const texture = Texture.initialState(WIDTH, HEIGHT, TEXTURE_SRC);
   const balls = Balls.initialState(MAX_BALLS, WIDTH, HEIGHT, BALL_COLORS);

@@ -33,7 +33,7 @@ const draw = state => {
   const { alpha } = timing;
   drawBackground(ctx, background);
   drawBalls(ctx, balls);
-  drawTexture(ctx, width, height, texture, alpha);
+  // drawTexture(ctx, width, height, texture, alpha);
 };
 
 export default draw;
