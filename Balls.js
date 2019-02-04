@@ -1,5 +1,5 @@
 import { setter } from "./state";
-import { peek } from "./utility";
+import { flip } from "./utility";
 
 const SPEED_SCALE = 1;
 const MAX_SPEED = 3;
@@ -11,12 +11,13 @@ const initialState = (
   colors = ["black", "white"]
 ) => {
   const balls = [];
+  const velocity = () => Math.random() * MAX_SPEED * flip();
   for (let i = 0; i < maxBalls; i += 1) {
     const x = Math.floor(Math.random() * maxX);
     const y = Math.floor(Math.random() * maxY);
     const r = Math.random() * 3;
-    const vx = Math.random() * MAX_SPEED;
-    const vy = Math.random() * MAX_SPEED;
+    const vx = velocity();
+    const vy = velocity();
     const color = colors[Math.floor(Math.random() * colors.length)];
     const prev = { x, y, vx, vy };
     const ball = { x, y, r, vx, vy, color, prev };
@@ -32,7 +33,6 @@ const updateBall = ({ ball, timing, width, height, set }) => {
   const reverseY = y > height || y < 0 ? -1 : 1;
   const newVX = vx * reverseX;
   const newVY = vy * reverseY;
-  peek("incremnet", increment);
   const xOffset = newVX * increment * SPEED_SCALE;
   const yOffset = newVY * increment * SPEED_SCALE;
   const newX = x + xOffset;

@@ -10,8 +10,8 @@ import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
 
-const IDEAL_FRAME_RATE = 60 / 1000;
-const IDEAL_STEP_RATE = 60 / 1000;
+const IDEAL_FRAMES_PER_SECOND = 60;
+const IDEAL_STEPS_PER_FRAME = 15;
 const WIDTH = 192;
 const HEIGHT = 108;
 const MAX_BALLS = 100;
@@ -41,7 +41,11 @@ const initialState = () => {
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   const now = performance.now();
-  const timing = Timing.initialState(IDEAL_FRAME_RATE, IDEAL_STEP_RATE, now);
+  const timing = Timing.initialState(
+    IDEAL_FRAMES_PER_SECOND,
+    IDEAL_STEPS_PER_FRAME,
+    now
+  );
   const background = Background.initialState("#334", WIDTH, HEIGHT);
   const texture = Texture.initialState(WIDTH, HEIGHT, TEXTURE_SRC);
   const balls = Balls.initialState(MAX_BALLS, WIDTH, HEIGHT, BALL_COLORS);
