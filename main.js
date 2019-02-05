@@ -11,7 +11,7 @@ import BEACH_SRC from "./beach.jpg";
 const TEXTURE_SRC = BEACH_SRC;
 
 const IDEAL_FRAMES_PER_SECOND = 60;
-const IDEAL_STEPS_PER_FRAME = 15;
+const IDEAL_STEPS_PER_FRAME = 2;
 const WIDTH = 192;
 const HEIGHT = 108;
 const MAX_BALLS = 100;
