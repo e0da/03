@@ -2,6 +2,7 @@ import { setter } from "./state";
 
 const SPEED_SCALE = 1;
 const MAX_SPEED = 3;
+const GRAVITY = 0.1;
 
 // Randomly returns -1 or 1
 const flip = () => (Math.random() >= 0.5 ? 1 : -1);
@@ -32,9 +33,8 @@ const updateBall = ({ ball, timing, width, height, set }) => {
   const { x, y, vx, vy } = ball;
   const { increment } = timing;
   const reverseX = x > width || x < 0 ? -1 : 1;
-  const reverseY = y > height || y < 0 ? -1 : 1;
   const newVX = vx * reverseX;
-  const newVY = vy * reverseY;
+  const newVY = y > height ? -50 * GRAVITY * Math.random() : vy + GRAVITY;
   const xOffset = newVX * increment * SPEED_SCALE;
   const yOffset = newVY * increment * SPEED_SCALE;
   const newX = x + xOffset;
