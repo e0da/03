@@ -20,7 +20,4 @@ const times = (n, cb) => {
   for (let i = 0; i < n; i += 1) cb();
 };
 
-// Randomly returns -1 or 1
-const flip = () => (Math.random() >= 0.5 ? 1 : -1);
-
-export { debug, log, warn, error, peek, unpeek, times, flip };
+export { debug, log, warn, error, peek, unpeek, times };

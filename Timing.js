@@ -1,13 +1,12 @@
-import { peek, unpeek } from "./utility";
-
-const maxFrameSkip = 5;
-
 const initialState = (
   idealFramesPerSecond = 60,
   idealStepsPerFrame = 1,
+  maxFrameSkip = 2,
   now = performance.now()
 ) => {
   const idealFrameTime = 1000 / idealFramesPerSecond;
+  const idealStepsPerMillisecond =
+    (idealStepsPerFrame * idealFramesPerSecond) / 1000;
   const last = now - idealFrameTime;
   const frameTime = now - last;
   const steps = idealStepsPerFrame;
@@ -19,36 +18,33 @@ const initialState = (
     idealFramesPerSecond,
     idealFrameTime,
     idealStepsPerFrame,
+    idealStepsPerMillisecond,
     last,
     leftover,
+    maxFrameSkip,
     now,
     steps
   };
 };
 
 const update = ({ timing, timestamp, set }) => {
-  const { idealFrameTime, idealFramesPerSecond, idealStepsPerFrame } = timing;
+  const {
+    idealFrameTime,
+    idealStepsPerMillisecond,
+    idealStepsPerFrame,
+    maxFrameSkip
+  } = timing;
   const last = timing.now;
   const now = timestamp;
   const frameTime = now - last;
   const maxSteps = maxFrameSkip * idealStepsPerFrame;
   const timeDemand = frameTime + timing.leftover;
-  const stepDemand =
-    (timeDemand * idealFramesPerSecond * idealStepsPerFrame) / 1000;
+  const stepDemand = timeDemand * idealStepsPerMillisecond;
   const steps = Math.floor(Math.min(maxSteps, stepDemand));
   const increment = 1 / idealStepsPerFrame;
   const simulated = steps * increment * idealFrameTime;
   const leftover = Math.max(0, frameTime - simulated);
-  const frameBias = leftover / increment;
-  peek(
-    {
-      frameBias,
-      leftover,
-      increment
-    },
-    "Timing"
-  );
-  unpeek("Timing");
+  const frameBias = leftover * idealStepsPerMillisecond;
   set("now", now);
   set("last", last);
   set("frameTime", frameTime);

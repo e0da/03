@@ -1,8 +1,10 @@
 import { setter } from "./state";
-import { flip } from "./utility";
 
 const SPEED_SCALE = 1;
 const MAX_SPEED = 3;
+
+// Randomly returns -1 or 1
+const flip = () => (Math.random() >= 0.5 ? 1 : -1);
 
 const initialState = (
   maxBalls = 10,
