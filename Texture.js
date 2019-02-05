@@ -27,7 +27,12 @@ const initialImage = src => {
   return img;
 };
 
-const initialState = (width = 160, height = 90, src = BLANK_SRC) => {
+const initialState = ({
+  width = 160,
+  height = 90,
+  src = BLANK_SRC,
+  enabled = true
+}) => {
   const img = initialImage(src);
   const prev = { width, height };
   return {
@@ -35,9 +40,9 @@ const initialState = (width = 160, height = 90, src = BLANK_SRC) => {
     width,
     height,
     prev,
+    enabled,
     xInhale: true,
     yInhale: true,
-    enabled: true,
     speed: 1
   };
 };

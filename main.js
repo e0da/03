@@ -9,6 +9,7 @@ import draw from "./drawing";
 import BEACH_SRC from "./beach.jpg";
 
 const TEXTURE_SRC = BEACH_SRC;
+const TEXTURE_ENABLED = false;
 
 const IDEAL_FRAMES_PER_SECOND = 60;
 const IDEAL_STEPS_PER_FRAME = 1;
@@ -49,7 +50,12 @@ const initialState = () => {
     now
   );
   const background = Background.initialState("#334", WIDTH, HEIGHT);
-  const texture = Texture.initialState(WIDTH, HEIGHT, TEXTURE_SRC);
+  const texture = Texture.initialState({
+    width: WIDTH,
+    height: HEIGHT,
+    src: TEXTURE_SRC,
+    enabled: TEXTURE_ENABLED
+  });
   const balls = Balls.initialState(MAX_BALLS, WIDTH, HEIGHT, BALL_COLORS);
 
   canvas.width = WIDTH;
