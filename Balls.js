@@ -1,7 +1,10 @@
 import { setter } from "./state";
 
-const SPEED_SCALE = 0.001;
-const MAX_SPEED = 10;
+const SPEED_SCALE = 1;
+const MAX_SPEED = 3;
+
+// Randomly returns -1 or 1
+const flip = () => (Math.random() >= 0.5 ? 1 : -1);
 
 const initialState = (
   maxBalls = 10,
@@ -10,12 +13,13 @@ const initialState = (
   colors = ["black", "white"]
 ) => {
   const balls = [];
+  const velocity = () => Math.random() * MAX_SPEED * flip();
   for (let i = 0; i < maxBalls; i += 1) {
     const x = Math.floor(Math.random() * maxX);
     const y = Math.floor(Math.random() * maxY);
     const r = Math.random() * 3;
-    const vx = Math.random() * MAX_SPEED;
-    const vy = Math.random() * MAX_SPEED;
+    const vx = velocity();
+    const vy = velocity();
     const color = colors[Math.floor(Math.random() * colors.length)];
     const prev = { x, y, vx, vy };
     const ball = { x, y, r, vx, vy, color, prev };
@@ -24,14 +28,15 @@ const initialState = (
   return balls;
 };
 
-const updateBall = ({ ball, dt, width, height, set }) => {
+const updateBall = ({ ball, timing, width, height, set }) => {
   const { x, y, vx, vy } = ball;
+  const { increment } = timing;
   const reverseX = x > width || x < 0 ? -1 : 1;
   const reverseY = y > height || y < 0 ? -1 : 1;
   const newVX = vx * reverseX;
   const newVY = vy * reverseY;
-  const xOffset = newVX * dt * SPEED_SCALE;
-  const yOffset = newVY * dt * SPEED_SCALE;
+  const xOffset = newVX * increment * SPEED_SCALE;
+  const yOffset = newVY * increment * SPEED_SCALE;
   const newX = x + xOffset;
   const newY = y + yOffset;
   set("prev.vx", vx);
@@ -44,9 +49,9 @@ const updateBall = ({ ball, dt, width, height, set }) => {
   set("y", newY);
 };
 
-const update = ({ balls, dt, width, height }) => {
+const update = ({ balls, timing, width, height }) => {
   balls.forEach(ball =>
-    updateBall({ ball, dt, width, height, set: setter(ball) })
+    updateBall({ ball, timing, width, height, set: setter(ball) })
   );
 };
 

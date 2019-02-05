@@ -1,13 +1,16 @@
+const interpolate = (bias, obj, key) =>
+  obj.prev[key] + (obj[key] - obj.prev[key]) * bias;
+
 const drawBackground = (ctx, background) => {
   ctx.fillStyle = background.color;
   ctx.fillRect(0, 0, background.w, background.h);
 };
 
-const drawTexture = (ctx, width, height, texture) => {
+const drawTexture = ({ ctx, width, height, texture, timing }) => {
   if (!texture.enabled) return;
-  const scale = 1;
-  const w = texture.width * scale;
-  const h = texture.height * scale;
+  const { frameBias } = timing;
+  const w = interpolate(frameBias, texture, "width");
+  const h = interpolate(frameBias, texture, "height");
   const x = width / 2 - w / 2;
   const y = height / 2 - h / 2;
   const originalSmoothing = ctx.imageSmoothingEnabled;
@@ -16,22 +19,25 @@ const drawTexture = (ctx, width, height, texture) => {
   ctx.imageSmoothingEnabled = originalSmoothing;
 };
 
-const drawBall = ctx => ball => {
+const drawBall = (ctx, timing) => ball => {
+  const { frameBias } = timing;
   ctx.fillStyle = ball.color;
   ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  const x = interpolate(frameBias, ball, "x");
+  const y = interpolate(frameBias, ball, "y");
+  ctx.arc(x, y, ball.r, 0, Math.PI * 2);
   ctx.fill();
 };
 
-const drawBalls = (ctx, balls) => {
-  balls.forEach(drawBall(ctx));
+const drawBalls = ({ ctx, timing, balls }) => {
+  balls.forEach(drawBall(ctx, timing));
 };
 
 const draw = state => {
-  const { ctx, width, height, background, balls, texture } = state;
+  const { ctx, width, height, background, balls, texture, timing } = state;
   drawBackground(ctx, background);
-  drawBalls(ctx, balls);
-  drawTexture(ctx, width, height, texture);
+  drawBalls({ ctx, timing, balls });
+  drawTexture({ ctx, width, height, texture, timing });
 };
 
 export default draw;
