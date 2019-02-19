@@ -1,3 +1,6 @@
+import * as PIXI from "pixi.js";
+import { peek, warn } from "./utility";
+
 const interpolate = (bias, obj, key) =>
   obj.prev[key] + (obj[key] - obj.prev[key]) * bias;
 
@@ -27,6 +30,7 @@ const drawBall = (ctx, timing) => ball => {
   const y = interpolate(frameBias, ball, "y");
   ctx.arc(x, y, ball.r, 0, Math.PI * 2);
   ctx.fill();
+  peek(ball, "ball drawing");
 };
 
 const drawBalls = ({ ctx, timing, balls }) => {
@@ -40,4 +44,13 @@ const draw = state => {
   drawTexture({ ctx, width, height, texture, timing });
 };
 
-export default draw;
+const ballGraphics = (cx, cy, color, radius) => {
+  const graphics = new PIXI.Graphics();
+  graphics.cacheAsBitmap = true;
+  graphics.beginFill(color);
+  graphics.arc({ cx, cy, radius });
+  graphics.endFill();
+  return graphics;
+};
+
+export { ballGraphics, draw };

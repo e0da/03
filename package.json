@@ -18,5 +18,8 @@
   "scripts": {
     "start": "parcel index.html",
     "lint": "eslint main.js"
+  },
+  "dependencies": {
+    "pixi.js": "^5.0.0-rc.2"
   }
 }

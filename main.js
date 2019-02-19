@@ -4,7 +4,7 @@ import * as Background from "./Background";
 import * as Balls from "./Balls";
 import * as Texture from "./Texture";
 import * as Timing from "./Timing";
-import draw from "./drawing";
+import { draw } from "./drawing";
 
 import BEACH_SRC from "./beach.jpg";
 

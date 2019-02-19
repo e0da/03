@@ -1,3 +1,4 @@
+import { ballGraphics } from "./drawing";
 import { setter } from "./state";
 
 const SPEED_SCALE = 1;
@@ -23,7 +24,8 @@ const initialState = (
     const vy = velocity();
     const color = colors[Math.floor(Math.random() * colors.length)];
     const prev = { x, y, vx, vy };
-    const ball = { x, y, r, vx, vy, color, prev };
+    const graphics = ballGraphics(color, r);
+    const ball = { x, y, r, vx, vy, color, prev, graphics };
     balls.push(ball);
   }
   return balls;
